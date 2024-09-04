@@ -51,7 +51,7 @@ public class MovieController {
 
   }
 
-  @GetMapping(value = "/movies" , consumes = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/movies" , produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity getAllMovies(){
     List<Movie> movieList = movieService.getAllMovies();
     List<MovieDTO> movieDTOList = new ArrayList<>();
