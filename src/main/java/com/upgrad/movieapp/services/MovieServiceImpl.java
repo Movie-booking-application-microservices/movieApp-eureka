@@ -7,6 +7,7 @@ import java.util.*;
 
 import com.upgrad.movieapp.entities.Theatre;
 import com.upgrad.movieapp.entities.User;
+import com.upgrad.movieapp.feign.TheatreServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class MovieServiceImpl implements MovieService{
+
 
   @Value("${userApp.url}")
   private String userAppUrl;
@@ -29,6 +31,9 @@ public class MovieServiceImpl implements MovieService{
 
   @Autowired
   private RestTemplate restTemplate;
+
+  @Autowired
+  private TheatreServiceClient theatreServiceClient;
 
   @Override
   public Movie acceptMovieDetails(Movie movie) {
@@ -89,27 +94,18 @@ public class MovieServiceImpl implements MovieService{
   @Override
   public Boolean bookMovie(User user, Movie movie, Theatre theatre) {
 
-    //Check whether requested movie is a valid movie.
+    //Check whether requested movie is valid or not.
     Optional<Movie> requestedMovie = movieDao.findById(movie.getMovieId());
     if(!requestedMovie.isPresent())
       return false;
 
-    //Check whether User is valid
-    Map<String, String> userUriMap = new HashMap<>();
+    //Check whether the user is valid.
+    Map<String,String> userUriMap = new HashMap<>();
     userUriMap.put("id",String.valueOf(user.getUserId()));
-    User receivedUser = (restTemplate.getForObject(userAppUrl,User.class,userUriMap));
-    if(receivedUser==null){
+    User receivedUser = restTemplate.getForObject(userAppUrl,User.class,userUriMap);
+    if(receivedUser==null)
       return false;
-    }
 
-    //Check whether theatre and movie combination is valid
-    Map<String, String> theatreUriMap = new HashMap<>();
-    theatreUriMap.put("theatreId",String.valueOf(theatre.getTheatreId()));
-    theatreUriMap.put("movieId",String.valueOf(theatre.getMovieId()));
-    Theatre receivedTheatre = (restTemplate.getForObject(theatreAppUrl,Theatre.class,theatreUriMap));
-    if(receivedTheatre==null){
-      return false;
-    }
 
     return true;
   }
