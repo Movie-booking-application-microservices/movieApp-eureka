@@ -8,6 +8,7 @@ import java.util.*;
 import com.upgrad.movieapp.entities.Theatre;
 import com.upgrad.movieapp.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,11 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class MovieServiceImpl implements MovieService{
 
+  @Value("${userApp.url}")
+  private String userAppUrl;
+
+  @Value("${theatreApp.url}")
+  private String theatreAppUrl;
 
   @Autowired
   private MovieDao movieDao ;
@@ -85,13 +91,12 @@ public class MovieServiceImpl implements MovieService{
 
     //Check whether requested movie is a valid movie.
     Optional<Movie> requestedMovie = movieDao.findById(movie.getMovieId());
-    if(requestedMovie.isEmpty())
+    if(!requestedMovie.isPresent())
       return false;
 
     //Check whether User is valid
     Map<String, String> userUriMap = new HashMap<>();
     userUriMap.put("id",String.valueOf(user.getUserId()));
-    String userAppUrl = "http://localhost:8080/user_app/v1/users/{id}";
     User receivedUser = (restTemplate.getForObject(userAppUrl,User.class,userUriMap));
     if(receivedUser==null){
       return false;
@@ -101,7 +106,6 @@ public class MovieServiceImpl implements MovieService{
     Map<String, String> theatreUriMap = new HashMap<>();
     theatreUriMap.put("theatreId",String.valueOf(theatre.getTheatreId()));
     theatreUriMap.put("movieId",String.valueOf(theatre.getMovieId()));
-    String theatreAppUrl = "http://localhost:8082/theatre_app/v1/theatres/{theatreId}/movie/{movieId}";
     Theatre receivedTheatre = (restTemplate.getForObject(theatreAppUrl,Theatre.class,theatreUriMap));
     if(receivedTheatre==null){
       return false;
