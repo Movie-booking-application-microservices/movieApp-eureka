@@ -6,6 +6,7 @@ name like USER-SERVICE and THEATRE-SERVICE and eureka automaticatlly discovers t
  img:
 ![image](https://github.com/user-attachments/assets/c911933f-043a-4944-b864-e177cc0bdbad)
 
-api-gateway service: to serve as a proxy url for all requests that hits anymicroservice configured in gateway route. Using API Gateway url to send request to movie app:
+api-gateway service: 
+It sits in front of a collection of services(that is configured in its route), acting as a single point of entry for all of them. Using API Gateway url to send request to movie app:
 ![image](https://github.com/user-attachments/assets/35ac1feb-edcb-4eed-a071-3e21f24b1ae8)
 
